@@ -122,14 +122,20 @@
                             Producto agrícola
                         </label>
                         <div class="relative">
-                            <select id="producto" x-model="form.producto" required
+                            {{--
+                                FIX: los <option> ahora se pintan dinámicamente desde $productos
+                                (pasado por el controlador) y su value es el ID REAL en la base
+                                de datos. Antes eran slugs escritos a mano ('mani_colorado',
+                                'cebolla_cabeza'...) que no coincidían con los nombres del seeder
+                                ni con un mapeo hardcodeado en el controlador, así que casi
+                                siempre se enviaba el producto equivocado a la IA.
+                            --}}
+                            <select id="producto" x-model="form.productoId" required
                                 class="appearance-none w-full rounded-xl border border-eplum-200 bg-eplum-50/60 text-eplum-900 text-sm px-4 py-3 pr-10 focus:outline-none focus:ring-4 focus:ring-eelectric/15 focus:border-eelectric transition">
                                 <option value="" disabled selected>Selecciona un producto</option>
-                                <option value="papa_imilla">Papa Imilla</option>
-                                <option value="tomate_perita">Tomate Perita</option>
-                                <option value="mani_colorado">Maní Colorado</option>
-                                <option value="cebolla_cabeza">Cebolla Cabeza</option>
-                                <option value="maiz_choclo">Maíz Choclo</option>
+                                @foreach ($productos as $producto)
+                                    <option value="{{ $producto->id }}">{{ $producto->name }}</option>
+                                @endforeach
                             </select>
                             <svg class="w-4 h-4 text-eplum-500 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/>
@@ -143,13 +149,13 @@
                             Mercado de destino (Sucre)
                         </label>
                         <div class="relative">
-                            <select id="mercado" x-model="form.mercado" required
+                            {{-- FIX: mismo criterio, IDs reales desde $mercados --}}
+                            <select id="mercado" x-model="form.mercadoId" required
                                 class="appearance-none w-full rounded-xl border border-eplum-200 bg-eplum-50/60 text-eplum-900 text-sm px-4 py-3 pr-10 focus:outline-none focus:ring-4 focus:ring-eelectric/15 focus:border-eelectric transition">
                                 <option value="" disabled selected>Selecciona un mercado</option>
-                                <option value="mayorista_el_morro">Mercado Mayorista El Morro</option>
-                                <option value="mercado_central">Mercado Central</option>
-                                <option value="mercado_campesino">Mercado Campesino</option>
-                                <option value="mercado_san_pedro">Mercado San Pedro</option>
+                                @foreach ($mercados as $mercado)
+                                    <option value="{{ $mercado->id }}">{{ $mercado->name }}</option>
+                                @endforeach
                             </select>
                             <svg class="w-4 h-4 text-eplum-500 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/>
@@ -227,8 +233,9 @@
     function prediccionForm() {
         return {
             form: {
-                producto: '',
-                mercado: '',
+                // FIX: ahora guardamos los IDs reales seleccionados, no slugs de texto
+                productoId: '',
+                mercadoId: '',
             },
             cargando: false,
             error: null,
@@ -254,7 +261,7 @@
             async calcular() {
                 this.error = null;
 
-                if (!this.form.producto || !this.form.mercado) {
+                if (!this.form.productoId || !this.form.mercadoId) {
                     this.error = 'Selecciona un producto y un mercado de destino.';
                     return;
                 }
@@ -271,15 +278,17 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                             'X-Requested-With': 'XMLHttpRequest',
                         },
+                        // FIX: enviamos IDs numéricos reales (product_id / market_point_id)
+                        // en vez de slugs de texto que requerían un mapeo manual propenso a errores.
                         body: JSON.stringify({
-                            producto: this.form.producto,
-                            mercado: this.form.mercado,
+                            product_id: Number(this.form.productoId),
+                            market_point_id: Number(this.form.mercadoId),
                         }),
                     });
 
                     if (!response.ok) {
                         const errData = await response.json().catch(() => null);
-                        throw new Error(errData?.message ?? 'No se pudo calcular la predicción. Intenta nuevamente.');
+                        throw new Error(errData?.error ?? errData?.message ?? 'No se pudo calcular la predicción. Intenta nuevamente.');
                     }
 
                     const data = await response.json();
