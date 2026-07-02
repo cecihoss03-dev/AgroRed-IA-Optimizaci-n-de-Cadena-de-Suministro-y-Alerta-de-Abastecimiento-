@@ -4,15 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MarketPoint extends Model
+class Product extends Model
 {
     protected $fillable = [
-        'name', 'type', 'location', 'active',
+        'name', 'category', 'unit_of_measure',
     ];
 
-    protected $casts = [
-        'active' => 'boolean',
-    ];
+    public function listings()
+    {
+        return $this->hasMany(ProductListing::class);
+    }
 
     public function priceHistories()
     {

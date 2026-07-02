@@ -54,6 +54,23 @@ class AgroRedSeeder extends Seeder
             ]
         );
         
+        $productorId = DB::table('users')->insertGetId([
+            'name' => 'Asencio',
+            'email' => 'asencio@agro.com',
+            'password' => $password,
+            'role' => 'productor',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $adminId = DB::table('users')->insertGetId([
+            'name' => 'Admin',
+            'email' => 'admin@agrored.com',
+            'password' => $password,
+            'role' => 'admin',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
 
         // ==========================================
