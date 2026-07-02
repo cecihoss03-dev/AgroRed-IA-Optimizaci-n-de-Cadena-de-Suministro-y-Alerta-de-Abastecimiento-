@@ -31,3 +31,5 @@ Route::get('/predecir', [PricePredictionController::class, 'index'])->name('pred
 
 // 3. CAMBIAR AQUÍ: De Route::get a Route::post para que acepte el envío del formulario
 Route::post('/predecir-json', [PricePredictionController::class, 'generate'])->name('prediccion.calcular');
+
+Route::post('/dashboard', [DashboardController::class, 'index'])->name('dashboard.stats');
