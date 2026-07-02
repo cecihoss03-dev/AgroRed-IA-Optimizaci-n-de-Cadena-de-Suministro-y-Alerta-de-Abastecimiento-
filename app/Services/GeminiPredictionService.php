@@ -15,7 +15,14 @@ class GeminiPredictionService
     public function __construct()
     {
         // Trae la API Key que guardamos en config/services.php
-        $this->apiKey = config('services.gemini.key');
+        $this->apiKey = config('services.gemini.key') ?? '';
+
+        if (empty($this->apiKey)) {
+            throw new Exception(
+                'GEMINI_API_KEY no está configurada. ' .
+                'Por favor, configura tu clave API en el archivo .env'
+            );
+        }
 
         // FIX: gemini-1.5-flash-latest fue retirado por Google (error 404 NOT_FOUND).
         // El modelo vigente equivalente en la familia actual es gemini-2.5-flash.
