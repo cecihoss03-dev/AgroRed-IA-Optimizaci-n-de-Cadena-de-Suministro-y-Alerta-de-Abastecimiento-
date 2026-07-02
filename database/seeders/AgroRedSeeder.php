@@ -18,7 +18,7 @@ class AgroRedSeeder extends Seeder
         $password = Hash::make('agrored2026');
 
         $productorId = DB::table('users')->insertGetId([
-            'name' => 'Don Asencio Choque',
+            'name' => 'Asencio',
             'email' => 'asencio@agro.com',
             'password' => $password,
             'role' => 'productor',
@@ -27,7 +27,7 @@ class AgroRedSeeder extends Seeder
         ]);
 
         $adminId = DB::table('users')->insertGetId([
-            'name' => 'Ceci Hoss Admin',
+            'name' => 'Admin',
             'email' => 'admin@agrored.com',
             'password' => $password,
             'role' => 'admin',
