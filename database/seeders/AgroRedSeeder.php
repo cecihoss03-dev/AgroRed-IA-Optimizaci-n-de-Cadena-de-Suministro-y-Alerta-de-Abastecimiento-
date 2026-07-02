@@ -17,23 +17,43 @@ class AgroRedSeeder extends Seeder
         // Ciframos una contraseña genérica para las pruebas del MVP
         $password = Hash::make('agrored2026');
 
-        $productorId = DB::table('users')->insertGetId([
-            'name' => 'Don Asencio Choque',
-            'email' => 'asencio@agro.com',
-            'password' => $password,
-            'role' => 'productor',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::table('users')->updateOrInsert(
+            ['email' => 'asencio@agro.com'],
+            [
+                'name' => 'Don Asencio Choque',
+                'password' => $password,
+                'role' => 'productor',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
 
-        $adminId = DB::table('users')->insertGetId([
-            'name' => 'Ceci Hoss Admin',
-            'email' => 'admin@agrored.com',
-            'password' => $password,
-            'role' => 'admin',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $productorId = DB::table('users')->where('email', 'asencio@agro.com')->value('id');
+
+        DB::table('users')->updateOrInsert(
+            ['email' => 'admin@agrored.com'],
+            [
+                'name' => 'Ceci Hoss Admin',
+                'password' => $password,
+                'role' => 'admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        $adminId = DB::table('users')->where('email', 'admin@agrored.com')->value('id');
+
+        DB::table('users')->updateOrInsert(
+            ['email' => 'comerciante@agro.com'],
+            [
+                'name' => 'Comerciante AgroRed',
+                'password' => $password,
+                'role' => 'mayorista',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        
 
 
         // ==========================================
